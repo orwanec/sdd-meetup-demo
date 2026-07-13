@@ -144,6 +144,7 @@ describe('Task Management (Milestone 4)', () => {
   });
 
   test('POST /tasks/:id/complete returns 404 for another user task', async () => {
+    // Two registrations + bcrypt can exceed default timeout under parallel load.
     const owner = request.agent(app);
     const other = request.agent(app);
 
