@@ -1,18 +1,24 @@
 <% if (!tasks || tasks.length === 0) { %>
-  <p>No tasks yet.</p>
+  <p class="empty-state">No tasks yet.</p>
 <% } else { %>
-  <ul>
+  <ul class="task-list">
     <% tasks.forEach(function (task) { %>
-      <li class="<%= task.status === 'completed' ? 'task-completed' : 'task-open' %>">
-        <strong><%= task.title %></strong>
-        <% if (task.description) { %>
-          <p><%= task.description %></p>
-        <% } %>
-        <% if (task.status === 'open') { %>
-          <button type="button" data-complete-task="<%= task.id %>">Mark complete</button>
-        <% } else { %>
-          <span>Completed</span>
-        <% } %>
+      <li class="task-item <%= task.status === 'completed' ? 'task-completed' : 'task-open' %>">
+        <div>
+          <strong><%= task.title %></strong>
+          <% if (task.description) { %>
+            <p><%= task.description %></p>
+          <% } %>
+        </div>
+        <div class="task-meta">
+          <% if (task.status === 'open') { %>
+            <button type="button" class="btn btn-secondary" data-complete-task="<%= task.id %>">
+              Mark complete
+            </button>
+          <% } else { %>
+            <span class="task-status">Completed</span>
+          <% } %>
+        </div>
       </li>
     <% }); %>
   </ul>

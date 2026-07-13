@@ -1,41 +1,41 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login · TaskFlow</title>
+    <%- include('../partials/head', { title: 'Login · TaskFlow' }) %>
   </head>
-  <body>
-    <main>
-      <h1>Login</h1>
+  <body class="page page-auth">
+    <main class="container">
+      <div class="auth-card">
+        <h1 class="page-title">Login</h1>
 
-      <% if (message) { %>
-        <p><%= message %></p>
-      <% } %>
+        <% if (message) { %>
+          <p class="alert alert-info"><%= message %></p>
+        <% } %>
 
-      <% if (error) { %>
-        <p role="alert"><%= error %></p>
-      <% } %>
+        <% if (error) { %>
+          <p class="form-error" role="alert"><%= error %></p>
+        <% } %>
 
-      <form method="post" action="/auth/login">
-        <label>
-          Email
-          <input type="email" name="email" value="<%= email %>" required />
-        </label>
+        <form method="post" action="/auth/login">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" value="<%= email %>" required />
+          </div>
 
-        <label>
-          Password
-          <input type="password" name="password" required />
-        </label>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required />
+          </div>
 
-        <button type="submit">Login</button>
-      </form>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+          </div>
+        </form>
 
-      <form method="post" action="/auth/logout" style="margin-top: 16px">
-        <button type="submit">Logout</button>
-      </form>
-
-      <p><a href="/auth/register">Register</a></p>
+        <div class="form-footer">
+          <p><a href="/auth/register">Create an account</a></p>
+        </div>
+      </div>
     </main>
   </body>
 </html>

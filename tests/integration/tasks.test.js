@@ -36,7 +36,7 @@ describe('Task Management (Milestone 4)', () => {
     const res = await agent.get('/tasks/create');
 
     expect(res.status).toBe(200);
-    expect(res.text).toContain('<h1>Create Task</h1>');
+    expect(res.text).toContain('Create Task</h1>');
     expect(res.text).toContain('action="/tasks/create"');
   });
 

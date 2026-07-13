@@ -15,7 +15,7 @@ describe('Authentication (Milestone 2)', () => {
     const res = await request(app).get('/auth/register');
 
     expect(res.status).toBe(200);
-    expect(res.text).toContain('<h1>Register</h1>');
+    expect(res.text).toContain('Register</h1>');
     expect(res.text).toContain('action="/auth/register"');
   });
 
@@ -94,7 +94,7 @@ describe('Authentication (Milestone 2)', () => {
     const dashRes = await agent.get('/dashboard');
     expect(dashRes.status).toBe(200);
     expect(dashRes.headers['cache-control']).toContain('no-store');
-    expect(dashRes.text).toContain('<h1>Dashboard</h1>');
+    expect(dashRes.text).toContain('Dashboard</h1>');
     expect(dashRes.text).toContain('Hello, session@example.com!');
     expect(dashRes.text).toContain('Total tasks: <strong>0</strong>');
     expect(dashRes.text).toContain('Open tasks: <strong>0</strong>');

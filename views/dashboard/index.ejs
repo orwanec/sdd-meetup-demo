@@ -1,30 +1,47 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard · TaskFlow</title>
+    <%- include('../partials/head', { title: 'Dashboard · TaskFlow' }) %>
   </head>
-  <body>
-    <main>
-      <h1>Dashboard</h1>
+  <body class="page page-dashboard">
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a href="/dashboard" class="site-logo">TaskFlow</a>
+        <div class="site-header__account">
+          <span class="site-header__user"><%= user.email %></span>
+          <form method="post" action="/auth/logout" class="site-header__logout">
+            <button type="submit" class="btn btn-ghost btn-header-logout">Logout</button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <main class="container dashboard-layout">
+      <h1 class="page-title">Dashboard</h1>
 
       <p>Hello, <%= user.email %>!</p>
 
-      <section aria-label="Task summary">
-        <p>Total tasks: <strong><%= stats.total %></strong></p>
-        <p>Open tasks: <strong><%= stats.open %></strong></p>
-        <p>Completed tasks: <strong><%= stats.completed %></strong></p>
+      <section class="stats-grid section-block" aria-label="Task summary">
+        <div class="stat-card">
+          <p>Total tasks: <strong><%= stats.total %></strong></p>
+        </div>
+        <div class="stat-card stat-card--open">
+          <p>Open tasks: <strong><%= stats.open %></strong></p>
+        </div>
+        <div class="stat-card stat-card--completed">
+          <p>Completed tasks: <strong><%= stats.completed %></strong></p>
+        </div>
       </section>
 
-      <section aria-label="Quick actions" style="margin-top: 16px">
-        <p><a href="/tasks/create">Create task</a></p>
-        <form method="post" action="/auth/logout">
-          <button type="submit">Logout</button>
-        </form>
+      <section class="section-block" aria-label="Quick actions">
+        <h2 class="section-title">Quick actions</h2>
+        <div class="actions-row">
+          <a href="/tasks/create" class="btn btn-primary">Create task</a>
+        </div>
       </section>
 
-      <section aria-label="Tasks" style="margin-top: 16px">
+      <section class="section-block" aria-label="Tasks">
+        <h2 class="section-title">Your tasks</h2>
         <%- include('../tasks/list', { tasks }) %>
       </section>
     </main>
