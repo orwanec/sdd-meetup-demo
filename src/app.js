@@ -1,3 +1,9 @@
+/**
+ * Express application factory for TaskFlow.
+ * Configures middleware (Helmet, sessions, CSRF), static assets, and route mounting.
+ * @module app
+ */
+
 require('dotenv').config();
 
 const express = require('express');
@@ -48,6 +54,7 @@ app.use(
 
 app.use(csrfProtection);
 
+/** Root redirect — dashboard if authenticated, otherwise login. */
 app.get('/', (req, res) => {
   if (req.session && req.session.user) {
     return res.redirect(302, '/dashboard');

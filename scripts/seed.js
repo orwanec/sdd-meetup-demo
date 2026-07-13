@@ -1,3 +1,9 @@
+/**
+ * Seeds demo users and sample tasks for local development.
+ * Safe to re-run — skips users that already exist.
+ * @module scripts/seed
+ */
+
 require('dotenv').config();
 
 const { initDatabase, closeDatabase } = require('../src/db');

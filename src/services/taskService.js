@@ -1,6 +1,16 @@
+/**
+ * Task CRUD operations and statistics.
+ * @module services/taskService
+ */
+
 const { getDb } = require('../db');
 const { sanitizeString, sanitizeText } = require('../utils/validation');
 
+/**
+ * Validates and sanitizes a task title.
+ * @param {string} title
+ * @returns {{ ok: true, title: string } | { ok: false, message: string }}
+ */
 function validateTitle(title) {
   const sanitized = sanitizeString(title);
   if (!sanitized) {
@@ -9,12 +19,23 @@ function validateTitle(title) {
   return { ok: true, title: sanitized };
 }
 
+/**
+ * @param {string|null|undefined} description
+ * @returns {string|null}
+ */
 function normalizeDescription(description) {
   if (typeof description !== 'string') return null;
   const sanitized = sanitizeText(description);
   return sanitized || null;
 }
 
+/**
+ * Creates a new open task for the given user.
+ * @param {number} userId
+ * @param {string} title
+ * @param {string|null} [description]
+ * @returns {Promise<object>} Created task row
+ */
 async function create(userId, title, description = null) {
   const titleCheck = validateTitle(title);
   if (!titleCheck.ok) {
@@ -33,6 +54,13 @@ async function create(userId, title, description = null) {
   return getById(result.lastID, userId);
 }
 
+/**
+ * Fetches a single task owned by the user.
+ * @param {number} taskId
+ * @param {number} userId
+ * @returns {Promise<object>}
+ * @throws {Error & { status: number }} 404 if not found
+ */
 async function getById(taskId, userId) {
   const db = getDb();
   const task = await dbGet(
@@ -50,6 +78,11 @@ async function getById(taskId, userId) {
   return task;
 }
 
+/**
+ * Returns all tasks for a user, newest first.
+ * @param {number} userId
+ * @returns {Promise<object[]>}
+ */
 async function getAll(userId) {
   const db = getDb();
   return dbAll(
@@ -59,6 +92,12 @@ async function getAll(userId) {
   );
 }
 
+/**
+ * Returns tasks filtered by status (`open` or `completed`).
+ * @param {number} userId
+ * @param {'open'|'completed'} status
+ * @returns {Promise<object[]>}
+ */
 async function getByStatus(userId, status) {
   if (!['open', 'completed'].includes(status)) {
     const err = new Error('Invalid status filter.');
@@ -74,6 +113,12 @@ async function getByStatus(userId, status) {
   );
 }
 
+/**
+ * Marks a task as completed with a timestamp.
+ * @param {number} taskId
+ * @param {number} userId
+ * @returns {Promise<object>} Updated task row
+ */
 async function complete(taskId, userId) {
   const db = getDb();
   const task = await dbGet(
@@ -97,6 +142,11 @@ async function complete(taskId, userId) {
   return getById(taskId, userId);
 }
 
+/**
+ * Aggregates task counts for dashboard display.
+ * @param {number} userId
+ * @returns {Promise<{ total: number, open: number, completed: number }>}
+ */
 async function getStats(userId) {
   const db = getDb();
   const statsRow = await dbGet(
