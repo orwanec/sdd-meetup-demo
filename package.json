@@ -1,0 +1,34 @@
+{
+  "name": "taskflow",
+  "version": "1.0.0",
+  "description": "A lightweight task management application — TaskFlow MVP",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": ["taskflow", "tasks", "sdd"],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testMatch": ["<rootDir>/tests/**/*.test.js"]
+  }
+}
