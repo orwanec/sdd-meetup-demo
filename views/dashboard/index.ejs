@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard · TaskFlow</title>
+  </head>
+  <body>
+    <main>
+      <h1>Dashboard</h1>
+
+      <p>Hello, <%= user.email %>!</p>
+
+      <section aria-label="Task summary">
+        <p>Total tasks: <strong><%= stats.total %></strong></p>
+        <p>Open tasks: <strong><%= stats.open %></strong></p>
+        <p>Completed tasks: <strong><%= stats.completed %></strong></p>
+      </section>
+
+      <section aria-label="Quick actions" style="margin-top: 16px">
+        <form method="post" action="/auth/logout">
+          <button type="submit">Logout</button>
+        </form>
+      </section>
+
+      <section aria-label="Tasks" style="margin-top: 16px">
+        <p>No tasks yet.</p>
+      </section>
+    </main>
+
+    <script>
+      // Some browsers restore pages from the back/forward cache without a network request.
+      // Force a reload so auth middleware can re-check the session after logout.
+      window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+          window.location.reload();
+        }
+      });
+    </script>
+  </body>
+</html>
+
