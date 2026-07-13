@@ -93,8 +93,12 @@ describe('Authentication (Milestone 2)', () => {
 
     const dashRes = await agent.get('/dashboard');
     expect(dashRes.status).toBe(200);
-    expect(dashRes.body.ok).toBe(true);
-    expect(dashRes.body.user.email).toBe('session@example.com');
+    expect(dashRes.headers['cache-control']).toContain('no-store');
+    expect(dashRes.text).toContain('<h1>Dashboard</h1>');
+    expect(dashRes.text).toContain('Hello, session@example.com!');
+    expect(dashRes.text).toContain('Total tasks: <strong>0</strong>');
+    expect(dashRes.text).toContain('Open tasks: <strong>0</strong>');
+    expect(dashRes.text).toContain('Completed tasks: <strong>0</strong>');
   });
 
   test('logout clears session', async () => {
