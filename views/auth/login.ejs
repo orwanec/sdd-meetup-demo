@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login · TaskFlow</title>
+  </head>
+  <body>
+    <main>
+      <h1>Login</h1>
+
+      <% if (message) { %>
+        <p><%= message %></p>
+      <% } %>
+
+      <% if (error) { %>
+        <p role="alert"><%= error %></p>
+      <% } %>
+
+      <form method="post" action="/auth/login">
+        <label>
+          Email
+          <input type="email" name="email" value="<%= email %>" required />
+        </label>
+
+        <label>
+          Password
+          <input type="password" name="password" required />
+        </label>
+
+        <button type="submit">Login</button>
+      </form>
+
+      <form method="post" action="/auth/logout" style="margin-top: 16px">
+        <button type="submit">Logout</button>
+      </form>
+
+      <p><a href="/auth/register">Register</a></p>
+    </main>
+  </body>
+</html>
