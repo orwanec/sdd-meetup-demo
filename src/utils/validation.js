@@ -11,7 +11,19 @@ function normalizeEmail(email) {
   return email.trim().toLowerCase();
 }
 
+function sanitizeString(value, maxLength = 200) {
+  if (typeof value !== 'string') return '';
+  return value.replace(/\0/g, '').trim().slice(0, maxLength);
+}
+
+function sanitizeText(value, maxLength = 2000) {
+  if (typeof value !== 'string') return '';
+  return value.replace(/\0/g, '').trim().slice(0, maxLength);
+}
+
 module.exports = {
   isValidEmail,
   normalizeEmail,
+  sanitizeString,
+  sanitizeText,
 };

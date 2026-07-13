@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <%- include('../partials/head', { title: 'Dashboard · TaskFlow' }) %>
+    <meta name="csrf-token" content="<%= csrfToken %>" />
   </head>
   <body class="page page-dashboard">
     <header class="site-header">
@@ -10,6 +11,7 @@
         <div class="site-header__account">
           <span class="site-header__user"><%= user.email %></span>
           <form method="post" action="/auth/logout" class="site-header__logout">
+            <%- include('../partials/csrf-field') %>
             <button type="submit" class="btn btn-ghost btn-header-logout">Logout</button>
           </form>
         </div>
