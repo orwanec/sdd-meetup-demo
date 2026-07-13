@@ -1,0 +1,29 @@
+<% if (!tasks || tasks.length === 0) { %>
+  <p>No tasks yet.</p>
+<% } else { %>
+  <ul>
+    <% tasks.forEach(function (task) { %>
+      <li class="<%= task.status === 'completed' ? 'task-completed' : 'task-open' %>">
+        <strong><%= task.title %></strong>
+        <% if (task.description) { %>
+          <p><%= task.description %></p>
+        <% } %>
+        <% if (task.status === 'open') { %>
+          <button type="button" data-complete-task="<%= task.id %>">Mark complete</button>
+        <% } else { %>
+          <span>Completed</span>
+        <% } %>
+      </li>
+    <% }); %>
+  </ul>
+
+  <script>
+    document.querySelectorAll('[data-complete-task]').forEach(function (button) {
+      button.addEventListener('click', async function () {
+        const taskId = button.getAttribute('data-complete-task');
+        await fetch('/tasks/' + taskId + '/complete', { method: 'POST' });
+        window.location.reload();
+      });
+    });
+  </script>
+<% } %>
