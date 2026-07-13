@@ -11,18 +11,28 @@ describe('Express app', () => {
     await closeDatabase();
   });
 
-  test('GET / returns 200', async () => {
+  test('GET / redirects unauthenticated users to login', async () => {
     const response = await request(app).get('/');
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/auth/login');
   });
 
-  test('GET / returns expected JSON shape', async () => {
-    const response = await request(app).get('/');
+  test('GET / redirects authenticated users to dashboard', async () => {
+    const agent = request.agent(app);
 
-    expect(response.body).toEqual({
-      status: 'ok',
-      message: 'TaskFlow server running',
+    await agent.post('/auth/register').type('form').send({
+      email: 'root@example.com',
+      password: 'password123',
     });
+    await agent.post('/auth/login').type('form').send({
+      email: 'root@example.com',
+      password: 'password123',
+    });
+
+    const response = await agent.get('/');
+
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/dashboard');
   });
 });

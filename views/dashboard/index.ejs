@@ -18,13 +18,14 @@
       </section>
 
       <section aria-label="Quick actions" style="margin-top: 16px">
+        <p><a href="/tasks/create">Create task</a></p>
         <form method="post" action="/auth/logout">
           <button type="submit">Logout</button>
         </form>
       </section>
 
       <section aria-label="Tasks" style="margin-top: 16px">
-        <p>No tasks yet.</p>
+        <%- include('../tasks/list', { tasks }) %>
       </section>
     </main>
 
@@ -39,4 +40,3 @@
     </script>
   </body>
 </html>
-

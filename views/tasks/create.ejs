@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create Task · TaskFlow</title>
+  </head>
+  <body>
+    <main>
+      <h1>Create Task</h1>
+
+      <% if (error) { %>
+        <p role="alert"><%= error %></p>
+      <% } %>
+
+      <form method="post" action="/tasks/create">
+        <label>
+          Title
+          <input type="text" name="title" value="<%= title %>" required />
+        </label>
+
+        <label>
+          Description
+          <textarea name="description" rows="4"><%= description %></textarea>
+        </label>
+
+        <button type="submit">Create Task</button>
+      </form>
+
+      <p><a href="/dashboard">Back to dashboard</a></p>
+    </main>
+  </body>
+</html>
