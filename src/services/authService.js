@@ -1,7 +1,17 @@
+/**
+ * Authentication business logic — registration and login.
+ * @module services/authService
+ */
+
 const { getDb } = require('../db');
 const { comparePassword, hashPassword } = require('./passwordService');
 const { isValidEmail, normalizeEmail } = require('../utils/validation');
 
+/**
+ * Validates password meets MVP requirements (min 8 characters).
+ * @param {string} password
+ * @returns {{ ok: true } | { ok: false, message: string }}
+ */
 function validatePassword(password) {
   if (typeof password !== 'string' || !password) {
     return { ok: false, message: 'Password is required.' };
@@ -12,6 +22,11 @@ function validatePassword(password) {
   return { ok: true };
 }
 
+/**
+ * Validates email format and uniqueness.
+ * @param {string} email
+ * @returns {Promise<{ ok: true, email: string } | { ok: false, message: string, status?: number }>}
+ */
 async function validateEmail(email) {
   const normalized = normalizeEmail(email);
   if (!isValidEmail(normalized)) {
@@ -27,6 +42,13 @@ async function validateEmail(email) {
   return { ok: true, email: normalized };
 }
 
+/**
+ * Registers a new user with hashed password.
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<{ id: number, email: string }>}
+ * @throws {Error & { status?: number, code?: string }} On validation or duplicate email
+ */
 async function register(email, password) {
   const emailCheck = await validateEmail(email);
   if (!emailCheck.ok) {
@@ -66,6 +88,13 @@ async function register(email, password) {
   }
 }
 
+/**
+ * Authenticates a user by email and password.
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<{ id: number, email: string }>}
+ * @throws {Error & { status?: number, code?: string }} On invalid credentials
+ */
 async function login(email, password) {
   const normalized = normalizeEmail(email);
   if (!isValidEmail(normalized)) {

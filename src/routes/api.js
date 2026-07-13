@@ -1,9 +1,15 @@
+/**
+ * JSON API routes for task data.
+ * @module routes/api
+ */
+
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const { getAll, getByStatus } = require('../services/taskService');
 
 const router = express.Router();
 
+/** GET /api/tasks — list tasks for the authenticated user, optionally filtered by status. */
 router.get('/tasks', requireAuth, async (req, res, next) => {
   try {
     const { status } = req.query;

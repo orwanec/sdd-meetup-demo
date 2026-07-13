@@ -1,7 +1,14 @@
+/**
+ * SQLite database initialization and schema management.
+ * Creates users, tasks, and sessions tables on first run.
+ * @module db
+ */
+
 const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
+/** @type {import('sqlite3').Database | null} */
 let db = null;
 
 const SCHEMA_STATEMENTS = [
@@ -64,6 +71,11 @@ function closeDatabaseConnection(database) {
   });
 }
 
+/**
+ * Opens (or reuses) the SQLite connection and applies schema migrations.
+ * Creates the data directory when using a file-based DB_PATH.
+ * @returns {Promise<import('sqlite3').Database>}
+ */
 async function initDatabase() {
   const dbPath = process.env.DB_PATH || './data/taskflow.db';
 
@@ -81,6 +93,11 @@ async function initDatabase() {
   return db;
 }
 
+/**
+ * Returns the active database connection.
+ * @returns {import('sqlite3').Database}
+ * @throws {Error} If initDatabase() has not been called
+ */
 function getDb() {
   if (!db) {
     throw new Error('Database not initialized. Call initDatabase() first.');
@@ -89,6 +106,10 @@ function getDb() {
   return db;
 }
 
+/**
+ * Closes the database connection and resets the module singleton.
+ * @returns {Promise<void>}
+ */
 async function closeDatabase() {
   if (!db) {
     return;

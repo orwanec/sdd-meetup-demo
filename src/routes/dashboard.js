@@ -1,3 +1,9 @@
+/**
+ * Dashboard route — personalized task summary and list.
+ * Maps to PRD requirements 7.3 and 7.4 (task viewing).
+ * @module routes/dashboard
+ */
+
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const { getAll, getStats } = require('../services/taskService');

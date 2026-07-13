@@ -1,3 +1,9 @@
+/**
+ * Authentication route handlers — registration, login, logout.
+ * Maps to PRD requirements 7.1, 7.2, and 7.5.
+ * @module routes/auth
+ */
+
 const express = require('express');
 
 const { register, login } = require('../services/authService');
@@ -62,4 +68,3 @@ router.post('/logout', (req, res) => {
 });
 
 module.exports = router;
-

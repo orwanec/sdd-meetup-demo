@@ -1,3 +1,9 @@
+/**
+ * TaskFlow server entry point.
+ * Loads environment config, initializes SQLite, and starts the HTTP listener.
+ * @module server
+ */
+
 require('dotenv').config();
 
 const app = require('./src/app');
@@ -6,6 +12,10 @@ const { initDatabase } = require('./src/db');
 const PORT = process.env.PORT || 3000;
 const DB_PATH = process.env.DB_PATH || './data/taskflow.db';
 
+/**
+ * Initializes the database and binds the Express app to PORT.
+ * @returns {Promise<void>}
+ */
 async function startServer() {
   await initDatabase();
 

@@ -1,9 +1,24 @@
+/**
+ * CSRF protection for form posts and JSON mutations.
+ * Tokens are stored in the session and exposed to EJS via res.locals.csrfToken.
+ * @module middleware/csrf
+ */
+
 const crypto = require('crypto');
 
+/**
+ * Generates a cryptographically random CSRF token.
+ * @returns {string} 64-character hex string
+ */
 function generateCsrfToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
+/**
+ * Ensures the session has a CSRF token, creating one if needed.
+ * @param {import('express').Request} req
+ * @returns {string|null}
+ */
 function ensureCsrfToken(req) {
   if (!req.session) {
     return null;
@@ -16,6 +31,11 @@ function ensureCsrfToken(req) {
   return req.session.csrfToken;
 }
 
+/**
+ * Determines whether the client expects a JSON error response.
+ * @param {import('express').Request} req
+ * @returns {boolean}
+ */
 function wantsJsonResponse(req) {
   if (req.path.startsWith('/api')) {
     return true;
@@ -29,6 +49,11 @@ function wantsJsonResponse(req) {
   return accept.includes('application/json') && !accept.includes('text/html');
 }
 
+/**
+ * Validates CSRF tokens on non-safe HTTP methods.
+ * Safe methods (GET, HEAD, OPTIONS) pass through after attaching the token to locals.
+ * @type {import('express').RequestHandler}
+ */
 function csrfProtection(req, res, next) {
   const token = ensureCsrfToken(req);
   res.locals.csrfToken = token;

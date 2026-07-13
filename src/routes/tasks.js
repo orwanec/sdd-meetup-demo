@@ -1,3 +1,9 @@
+/**
+ * Task HTML and JSON action routes — create and complete tasks.
+ * Maps to PRD requirement 7.4 (task creation and completion).
+ * @module routes/tasks
+ */
+
 const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const { create, complete } = require('../services/taskService');
