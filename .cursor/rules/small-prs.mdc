@@ -1,0 +1,24 @@
+---
+description: Enforce small, reviewable PRs (one change, one intent)
+alwaysApply: true
+---
+
+# Small PRs (Enforced)
+
+## Default PR shape
+
+- One intent per PR (one feature, bugfix, refactor, or chore).
+- Prefer a “thin vertical slice”: tests → minimal implementation → cleanup.
+- Keep commits small and coherent; avoid “misc fixes” bundles.
+
+## Stop conditions (split the PR)
+
+- The PR changes multiple unrelated areas (e.g., UI + infra + backend) without a single unifying goal.
+- You can’t explain the PR in one sentence without using “and”.
+- Reviewer would need to understand >1 subsystem to verify the main change.
+
+## Practical heuristics
+
+- If the change touches >10 files, consider splitting.
+- If a new feature requires multiple acceptance criteria, ship them as separate slices unless they are inseparable.
+- Prefer follow-up PRs for formatting, renames, broad refactors, dependency upgrades, or drive-by cleanup.

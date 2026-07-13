@@ -189,6 +189,43 @@ Each tech plan should include:
 3. Tests written to match acceptance criteria from spec
 4. Implementation tracked against specifications
 
+---
+
+## Testing Convention (Test-First)
+
+For any feature change or bugfix, default to **red → green → refactor**:
+
+1. **Red**: write/update a test that fails and captures the intended behavior (ideally mapped to acceptance criteria).
+2. **Green**: implement the smallest change that makes the test pass.
+3. **Refactor**: clean up only after tests are green.
+
+**Definition of done (testing):**
+- `npm test` passes locally/CI.
+- Add/adjust tests in the same PR as the behavior change.
+- Prefer a mix of unit tests (`tests/unit/**`) and integration tests (`tests/integration/**`) when applicable.
+
+---
+
+## Pull Request Convention (Small PRs)
+
+Default expectation: **one intent per PR** and keep it easy to review.
+
+**Stop conditions (split the PR):**
+- The PR contains multiple unrelated changes (you need “and” to describe it).
+- It spans multiple subsystems without a single unifying goal.
+- The reviewer must understand more than one area to verify the primary change.
+
+**Practical heuristics:**
+- If the PR touches **>10 files**, strongly consider splitting.
+- Prefer follow-up PRs for broad refactors, renames, dependency upgrades, formatting, and drive-by cleanup.
+
+### Cursor enforcement (project rules)
+
+This repo keeps always-on agent guidance in `.cursor/rules/`. Relevant rules:
+
+- `.cursor/rules/test-first.mdc` — test-first (red → green → refactor)
+- `.cursor/rules/small-prs.mdc` — small PR expectations and “split” triggers
+
 ### Phase 4: Validation
 1. Verify implementation matches product spec
 2. Conduct acceptance testing against spec criteria
@@ -349,3 +386,4 @@ For questions about these conventions, refer to:
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-07-13 | Initial conventions document created |
+| 1.1 | 2026-07-13 | Added test-first workflow and small PR conventions |

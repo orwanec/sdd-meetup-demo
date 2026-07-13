@@ -1,0 +1,24 @@
+---
+description: Test-first workflow (red-green) for all feature work
+alwaysApply: true
+---
+
+# Test-First (Red → Green → Refactor)
+
+## Default workflow
+
+- Start by writing or updating a failing test that captures the intended behavior (or acceptance criterion).
+- Then implement the smallest change to make the test pass.
+- Refactor only after tests are green.
+
+## Coverage expectations
+
+- Prefer a mix of:
+  - Unit tests for services/utils (`tests/unit/**`)
+  - Integration tests for routes and flows (`tests/integration/**`, Supertest)
+- If a change is tied to `specs/prd-001.md` acceptance criteria, add/adjust test coverage for that criterion in the same PR.
+
+## Definition of done for a feature change
+
+- `npm test` passes.
+- At least one integration test covers the primary happy-path workflow (when applicable).
