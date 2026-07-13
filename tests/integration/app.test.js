@@ -1,6 +1,7 @@
 const request = require('supertest');
 const { initDatabase, closeDatabase } = require('../../src/db');
 const app = require('../../src/app');
+const { postFormWithCsrf } = require('../helpers/http');
 
 describe('Express app', () => {
   beforeEach(async () => {
@@ -21,14 +22,24 @@ describe('Express app', () => {
   test('GET / redirects authenticated users to dashboard', async () => {
     const agent = request.agent(app);
 
-    await agent.post('/auth/register').type('form').send({
-      email: 'root@example.com',
-      password: 'password123',
-    });
-    await agent.post('/auth/login').type('form').send({
-      email: 'root@example.com',
-      password: 'password123',
-    });
+    await postFormWithCsrf(
+      agent,
+      '/auth/register',
+      {
+        email: 'root@example.com',
+        password: 'password123',
+      },
+      '/auth/register'
+    );
+    await postFormWithCsrf(
+      agent,
+      '/auth/login',
+      {
+        email: 'root@example.com',
+        password: 'password123',
+      },
+      '/auth/login'
+    );
 
     const response = await agent.get('/');
 

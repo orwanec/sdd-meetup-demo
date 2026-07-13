@@ -12,7 +12,11 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
-  "keywords": ["taskflow", "tasks", "sdd"],
+  "keywords": [
+    "taskflow",
+    "tasks",
+    "sdd"
+  ],
   "license": "UNLICENSED",
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -20,6 +24,7 @@
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "helmet": "^7.2.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
@@ -28,7 +33,11 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
-    "testMatch": ["<rootDir>/tests/**/*.test.js"]
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ]
   }
 }

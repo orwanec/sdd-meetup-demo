@@ -27,7 +27,12 @@
     document.querySelectorAll('[data-complete-task]').forEach(function (button) {
       button.addEventListener('click', async function () {
         const taskId = button.getAttribute('data-complete-task');
-        await fetch('/tasks/' + taskId + '/complete', { method: 'POST' });
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+        await fetch('/tasks/' + taskId + '/complete', {
+          method: 'POST',
+          headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+        });
         window.location.reload();
       });
     });

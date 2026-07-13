@@ -1,17 +1,7 @@
 const request = require('supertest');
 const { initDatabase, closeDatabase } = require('../../src/db');
 const app = require('../../src/app');
-
-async function registerAndLogin(agent, email = 'style@example.com') {
-  await agent.post('/auth/register').type('form').send({
-    email,
-    password: 'password123',
-  });
-  await agent.post('/auth/login').type('form').send({
-    email,
-    password: 'password123',
-  });
-}
+const { postFormWithCsrf, registerAndLogin } = require('../helpers/http');
 
 describe('Styling (Milestone 5)', () => {
   beforeEach(async () => {
@@ -81,7 +71,7 @@ describe('Styling (Milestone 5)', () => {
     const agent = request.agent(app);
     await registerAndLogin(agent);
 
-    await agent.post('/tasks/create').type('form').send({ title: 'Styled task' });
+    await postFormWithCsrf(agent, '/tasks/create', { title: 'Styled task' });
 
     const res = await agent.get('/dashboard');
 

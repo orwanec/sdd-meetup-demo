@@ -1,17 +1,7 @@
 const request = require('supertest');
 const { initDatabase, closeDatabase } = require('../../src/db');
 const app = require('../../src/app');
-
-async function registerAndLogin(agent, email = 'tasks@example.com') {
-  await agent.post('/auth/register').type('form').send({
-    email,
-    password: 'password123',
-  });
-  await agent.post('/auth/login').type('form').send({
-    email,
-    password: 'password123',
-  });
-}
+const { postFormWithCsrf, registerAndLogin } = require('../helpers/http');
 
 describe('Task Management (Milestone 4)', () => {
   beforeEach(async () => {
@@ -38,16 +28,22 @@ describe('Task Management (Milestone 4)', () => {
     expect(res.status).toBe(200);
     expect(res.text).toContain('Create Task</h1>');
     expect(res.text).toContain('action="/tasks/create"');
+    expect(res.text).toContain('name="_csrf"');
   });
 
   test('POST /tasks/create rejects empty title', async () => {
     const agent = request.agent(app);
     await registerAndLogin(agent);
 
-    const res = await agent.post('/tasks/create').type('form').send({
-      title: '   ',
-      description: 'Optional notes',
-    });
+    const res = await postFormWithCsrf(
+      agent,
+      '/tasks/create',
+      {
+        title: '   ',
+        description: 'Optional notes',
+      },
+      '/tasks/create'
+    );
 
     expect(res.status).toBe(400);
     expect(res.text).toContain('Title is required.');
@@ -57,7 +53,7 @@ describe('Task Management (Milestone 4)', () => {
     const agent = request.agent(app);
     await registerAndLogin(agent);
 
-    const res = await agent.post('/tasks/create').type('form').send({
+    const res = await postFormWithCsrf(agent, '/tasks/create', {
       title: 'Buy groceries',
     });
 
@@ -74,7 +70,7 @@ describe('Task Management (Milestone 4)', () => {
     const agent = request.agent(app);
     await registerAndLogin(agent);
 
-    await agent.post('/tasks/create').type('form').send({
+    await postFormWithCsrf(agent, '/tasks/create', {
       title: 'Write report',
       description: 'Quarterly summary',
     });
@@ -88,30 +84,35 @@ describe('Task Management (Milestone 4)', () => {
     const agent = request.agent(app);
     await registerAndLogin(agent);
 
-    await agent.post('/tasks/create').type('form').send({
+    await postFormWithCsrf(agent, '/tasks/create', {
       title: 'Finish milestone',
     });
 
     const apiRes = await agent.get('/api/tasks');
     const taskId = apiRes.body[0].id;
 
-    const completeRes = await agent.post(`/tasks/${taskId}/complete`);
+    const dashRes = await agent.get('/dashboard');
+    const tokenMatch = dashRes.text.match(/name="csrf-token"\s+content="([^"]+)"/);
+
+    const completeRes = await agent
+      .post(`/tasks/${taskId}/complete`)
+      .set('X-CSRF-Token', tokenMatch[1]);
     expect(completeRes.status).toBe(200);
     expect(completeRes.body.success).toBe(true);
     expect(completeRes.body.task.status).toBe('completed');
 
-    const dashRes = await agent.get('/dashboard');
-    expect(dashRes.text).toContain('Finish milestone');
-    expect(dashRes.text).toContain('Completed tasks: <strong>1</strong>');
-    expect(dashRes.text).toContain('task-completed');
+    const updatedDash = await agent.get('/dashboard');
+    expect(updatedDash.text).toContain('Finish milestone');
+    expect(updatedDash.text).toContain('Completed tasks: <strong>1</strong>');
+    expect(updatedDash.text).toContain('task-completed');
   });
 
   test('GET /api/tasks returns tasks for authenticated user', async () => {
     const agent = request.agent(app);
     await registerAndLogin(agent);
 
-    await agent.post('/tasks/create').type('form').send({ title: 'Task A' });
-    await agent.post('/tasks/create').type('form').send({ title: 'Task B' });
+    await postFormWithCsrf(agent, '/tasks/create', { title: 'Task A' });
+    await postFormWithCsrf(agent, '/tasks/create', { title: 'Task B' });
 
     const res = await agent.get('/api/tasks');
     expect(res.status).toBe(200);
@@ -123,12 +124,15 @@ describe('Task Management (Milestone 4)', () => {
     const agent = request.agent(app);
     await registerAndLogin(agent);
 
-    await agent.post('/tasks/create').type('form').send({ title: 'Open task' });
-    await agent.post('/tasks/create').type('form').send({ title: 'Done task' });
+    await postFormWithCsrf(agent, '/tasks/create', { title: 'Open task' });
+    await postFormWithCsrf(agent, '/tasks/create', { title: 'Done task' });
 
     const apiRes = await agent.get('/api/tasks');
     const doneTaskId = apiRes.body.find((t) => t.title === 'Done task').id;
-    await agent.post(`/tasks/${doneTaskId}/complete`);
+
+    const dashRes = await agent.get('/dashboard');
+    const tokenMatch = dashRes.text.match(/name="csrf-token"\s+content="([^"]+)"/);
+    await agent.post(`/tasks/${doneTaskId}/complete`).set('X-CSRF-Token', tokenMatch[1]);
 
     const openRes = await agent.get('/api/tasks?status=open');
     expect(openRes.body).toHaveLength(1);
@@ -146,11 +150,13 @@ describe('Task Management (Milestone 4)', () => {
     await registerAndLogin(owner, 'owner@example.com');
     await registerAndLogin(other, 'other@example.com');
 
-    await owner.post('/tasks/create').type('form').send({ title: 'Private task' });
+    await postFormWithCsrf(owner, '/tasks/create', { title: 'Private task' });
     const ownerTasks = await owner.get('/api/tasks');
     const taskId = ownerTasks.body[0].id;
 
-    const res = await other.post(`/tasks/${taskId}/complete`);
+    const otherDash = await other.get('/dashboard');
+    const tokenMatch = otherDash.text.match(/name="csrf-token"\s+content="([^"]+)"/);
+    const res = await other.post(`/tasks/${taskId}/complete`).set('X-CSRF-Token', tokenMatch[1]);
     expect(res.status).toBe(404);
   });
 
@@ -158,12 +164,17 @@ describe('Task Management (Milestone 4)', () => {
     const agent = request.agent(app);
     await registerAndLogin(agent, 'persist@example.com');
 
-    await agent.post('/tasks/create').type('form').send({ title: 'Remember me' });
-    await agent.post('/auth/logout');
-    await agent.post('/auth/login').type('form').send({
-      email: 'persist@example.com',
-      password: 'password123',
-    });
+    await postFormWithCsrf(agent, '/tasks/create', { title: 'Remember me' });
+    await postFormWithCsrf(agent, '/auth/logout', {}, '/dashboard');
+    await postFormWithCsrf(
+      agent,
+      '/auth/login',
+      {
+        email: 'persist@example.com',
+        password: 'password123',
+      },
+      '/auth/login'
+    );
 
     const dashRes = await agent.get('/dashboard');
     expect(dashRes.text).toContain('Remember me');

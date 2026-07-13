@@ -1,16 +1,18 @@
 const { getDb } = require('../db');
+const { sanitizeString, sanitizeText } = require('../utils/validation');
 
 function validateTitle(title) {
-  if (typeof title !== 'string' || !title.trim()) {
+  const sanitized = sanitizeString(title);
+  if (!sanitized) {
     return { ok: false, message: 'Title is required.' };
   }
-  return { ok: true, title: title.trim() };
+  return { ok: true, title: sanitized };
 }
 
 function normalizeDescription(description) {
   if (typeof description !== 'string') return null;
-  const trimmed = description.trim();
-  return trimmed || null;
+  const sanitized = sanitizeText(description);
+  return sanitized || null;
 }
 
 async function create(userId, title, description = null) {
