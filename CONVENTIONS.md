@@ -8,6 +8,8 @@ This document outlines the conventions and file organization structure used in T
 
 TaskFlow follows a **Spec-Driven Development** approach, where specifications are defined upfront before implementation. This ensures clarity, alignment, and reduces rework.
 
+**For humans and AI agents:** the [SDD Workflow for Agents](#sdd-workflow-for-agents) section in this file is the canonical guide for creating PRDs, tech plans, and validating implementation — regardless of which tool you use.
+
 ---
 
 ## Directory Structure
@@ -15,8 +17,8 @@ TaskFlow follows a **Spec-Driven Development** approach, where specifications ar
 ```
 sdd-meetup-demo/
 ├── specs/                    # Product specifications (business-oriented)
-│   ├── prd-001.md           # Product Requirements Document
-│   ├── prd-002.md           # Future PRDs for new features
+│   ├── prd-001.md           # Product Requirements Document (MVP)
+│   ├── prd-002.md           # Product Requirements Document (Password Reset)
 │   └── README.md            # Specs directory guide
 │
 ├── tech-plans/              # Technical implementation plans
@@ -95,7 +97,7 @@ All specification and planning documents follow a **sequential numbering scheme*
 - Code structure
 - Infrastructure details
 
-### File Structure
+### PRD File Structure
 
 Each PRD should include:
 1. Project Overview
@@ -146,7 +148,7 @@ Each PRD should include:
 - User workflows (see `/specs/`)
 - Marketing or business strategy
 
-### File Structure
+### Tech Plan File Structure
 
 Each tech plan should include:
 1. Overview / Executive Summary
@@ -168,20 +170,145 @@ Each tech plan should include:
 
 ---
 
+## SDD Workflow for Agents
+
+This section is the **canonical SDD guide** for humans and AI agents — Cursor, Claude Code, Copilot, or any other tool. Tool-specific rules (e.g. `.cursor/rules/`) mirror this document but do not replace it.
+
+**Before creating or editing any SDD artifact**, read this section and the most recent example of that artifact type in the repo.
+
+| Action | Read first | Output location |
+|--------|------------|-----------------|
+| Create a PRD | This section + latest PRD in `specs/` | `specs/prd-{NNN}.md` |
+| Create a tech plan | This section + the PRD it implements + latest tech plan | `tech-plans/tech-plan-{NNN}.md` |
+| Implement a feature | Approved PRD + matching tech plan | `src/`, `tests/` |
+
+---
+
+### Creating a PRD
+
+Use this workflow when adding a new feature or materially changing product scope.
+
+#### Step 1 — Gather context
+
+1. Read this file (`CONVENTIONS.md`), especially [Specs Directory](#specs-directory-specs) and [Key Principles](#key-principles).
+2. Read the latest PRD in `specs/` (e.g. `prd-001.md`) as the **structure and tone template** — do not invent a new format from memory.
+3. Read any upstream PRDs the feature builds on (e.g. password reset builds on `prd-001` auth scope).
+4. Collect input from the requester: user story, acceptance criteria, constraints.
+
+#### Step 2 — Create the file
+
+1. Pick the next sequential number: `specs/prd-002.md`, `specs/prd-003.md`, etc.
+2. Add a status header at the top: `**Status:** Draft`
+3. Fill every section listed in [PRD File Structure](#prd-file-structure) above.
+   - If a section does not apply, write `N/A — [reason]` rather than omitting it.
+4. Keep the document **implementation-agnostic** — no stack, database schema, API routes, or code structure.
+
+#### Step 3 — Required content
+
+Every PRD must include at minimum:
+
+- **User story** — "As a … I want … so that …"
+- **Detailed requirements** — numbered subsections (e.g. §7.1, §7.2) with validation rules and behavior
+- **Acceptance criteria** — checkbox list (`- [ ]`) that QA and tests can trace to
+- **Out of scope** — explicit boundaries to prevent scope creep
+- **Related documents** — links to prior PRDs in the Appendix
+
+Reuse product facts from earlier PRDs (personas, password rules, etc.) instead of redefining them inconsistently.
+
+#### Step 4 — Review and approve
+
+1. Self-check against [Best Practices](#best-practices) and [Anti-Drift Rules](#anti-drift-rules) below.
+2. Get product stakeholder sign-off (Approval & Sign-Off table).
+3. Set `**Status:** Active` — the PRD is now the maintained source of truth for *what* to build.
+
+#### Step 5 — After implementation (do not skip)
+
+1. Run the [Cross-Check Protocol](#cross-check-protocol) against the running code.
+2. Update the PRD only if product requirements changed during delivery; note changes in Document History.
+3. Do **not** freeze the PRD — it stays `Active` and evolvable.
+
+---
+
+### Creating a Tech Plan
+
+Use this workflow after the PRD is `Active`.
+
+#### Step 1 — Gather context
+
+1. Read this file and the PRD being implemented (all acceptance criteria, not just a summary).
+2. Read the latest tech plan in `tech-plans/` as the structure template.
+3. Inspect the current codebase — frozen specs may have stale file paths or class names.
+
+#### Step 2 — Create the file
+
+1. Pick the next sequential number: `tech-plans/tech-plan-002.md`, etc.
+2. Add `**Status:** Draft` at the top.
+3. Open with **Implementation of** — a link to the PRD (e.g. "Implements [prd-002](../specs/prd-002.md)").
+4. Fill every section listed in [Tech Plan File Structure](#tech-plan-file-structure) above.
+
+#### Step 3 — Approve and implement
+
+1. Get technical lead sign-off.
+2. Set `**Status:** Active` while work is in progress.
+3. When fully delivered, set `**Status:** Implemented (YYYY-MM-DD)` and **freeze** the plan — do not edit it again. New work in the same area needs a new PRD and tech plan.
+
+---
+
+### Anti-Drift Rules
+
+These apply to every agent and contributor:
+
+- **Never skip PRD sections** — use `N/A — [reason]` if truly irrelevant.
+- **Never implement requirements that differ from the PRD without updating the PRD first.** If the same feature’s requirements change (including when something is infeasible), **revise the existing PRD** (Document History + re-approval). **Create a new numbered PRD** only for new scope or follow-up work after the original feature is delivered.
+- **Never put implementation details in PRDs** or business requirements in tech plans.
+- **Always keep code and spec aligned** — if they diverge, fix the code or update the PRD; do not leave them out of sync.
+- **Always verify API contracts** match actual behavior after backend changes.
+- **Trust frozen specs for decisions and rationale**; **verify file paths and code patterns** against the current codebase.
+
+---
+
+### Cross-Check Protocol
+
+After implementing a feature, before marking work complete:
+
+1. Read the PRD — **all** acceptance criteria, not only the ones touched in the current slice.
+2. For each acceptance criterion, verify pass/fail in the running code or test suite.
+3. Report pass/fail per criterion.
+4. Fix code or update the PRD for any failure.
+
+---
+
+### Spec Lifecycle & Status Headers
+
+Every spec artifact must include a `**Status:**` line near the top.
+
+| Artifact | Draft | Active | Implemented (frozen) |
+|----------|-------|--------|----------------------|
+| PRD | Initial writing / review | Approved source of truth | N/A — PRDs stay Active |
+| Tech plan | Initial writing / review | Work in progress | Delivery complete — do not edit |
+
+When reading a spec with `Status: Implemented`:
+
+- **Trust:** decisions, rationale, PRD rule mappings, acceptance criteria
+- **Do not trust:** file paths, class names, method signatures — verify in code
+- **Never edit** a frozen plan; create a new PRD + tech plan for follow-up work
+
+---
+
 ## Spec-Driven Development Workflow
 
 ### Phase 1: Product Specification
-1. Create `specs/prd-{number}.md` with product requirements
+1. Follow [Creating a PRD](#creating-a-prd) above
 2. Define user needs, features, and acceptance criteria
-3. Get product stakeholder approval
+3. Get product stakeholder approval → set `Status: Active`
 4. **No technical decisions included**
 
 ### Phase 2: Technical Planning
-1. Create `tech-plans/tech-plan-{number}.md` based on approved PRD
-2. Reference which PRD this implements (e.g., "Implements prd-001")
+1. Follow [Creating a Tech Plan](#creating-a-tech-plan) above
+2. Reference which PRD this implements (e.g., "Implements prd-002")
 3. Design architecture and make technology choices
 4. Create detailed implementation plan with timelines
-5. Get technical lead approval
+5. Get technical lead approval → set `Status: Active`, then `Implemented (YYYY-MM-DD)` when done
 
 ### Phase 3: Implementation
 1. Developers follow the spec and tech plan
@@ -219,16 +346,18 @@ Default expectation: **one intent per PR** and keep it easy to review.
 - If the PR touches **>10 files**, strongly consider splitting.
 - Prefer follow-up PRs for broad refactors, renames, dependency upgrades, formatting, and drive-by cleanup.
 
-### Cursor enforcement (project rules)
+### Agent guidance
 
-This repo keeps always-on agent guidance in `.cursor/rules/`. Relevant rules:
+**Canonical source:** [SDD Workflow for Agents](#sdd-workflow-for-agents) in this file — use it for any human or AI contributor.
+
+Cursor users also get always-on rules in `.cursor/rules/` that mirror parts of this document:
 
 - `.cursor/rules/test-first.mdc` — test-first (red → green → refactor)
 - `.cursor/rules/small-prs.mdc` — small PR expectations and “split” triggers
 
 ### Phase 4: Validation
-1. Verify implementation matches product spec
-2. Conduct acceptance testing against spec criteria
+1. Follow the [Cross-Check Protocol](#cross-check-protocol) against the PRD acceptance criteria
+2. Verify implementation matches product spec
 3. Validate against success metrics
 4. Deploy to production
 
@@ -387,3 +516,5 @@ For questions about these conventions, refer to:
 |---------|------|---------|
 | 1.0 | 2026-07-13 | Initial conventions document created |
 | 1.1 | 2026-07-13 | Added test-first workflow and small PR conventions |
+| 1.2 | 2026-07-15 | Added agent-agnostic SDD workflow (PRD, tech plan, anti-drift, cross-check) |
+| 1.3 | 2026-07-15 | Clarified anti-drift rule: revise existing PRD vs create new numbered PRD |
