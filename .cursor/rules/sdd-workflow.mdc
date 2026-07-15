@@ -13,6 +13,8 @@ Canonical source: `CONVENTIONS.md` → **SDD Workflow for Agents**. This rule ga
 2. **Tech plan** — `tech-plans/tech-plan-{NNN}.md` with `Status: Active` (or `Implemented` if read-only)
 3. **Implementation** — `src/`, `tests/`, `views/`, etc.
 
+**Each phase is a separate session.** Do not combine planning and implementation in one agent turn or context window.
+
 ## Before editing `src/` or `tests/` for a PRD feature
 
 1. Identify the PRD number (e.g. user says "implement prd-002").
@@ -22,10 +24,31 @@ Canonical source: `CONVENTIONS.md` → **SDD Workflow for Agents**. This rule ga
 
 ## Stop conditions (do NOT implement)
 
-- User asks to implement a PRD but **no matching tech plan** exists → create the tech plan first.
-- PRD is **`Status: Draft`** → get approval and set to `Active` before coding.
-- Tech plan is **`Status: Draft`** → get approval and set to `Active` before coding.
+- User asks to implement a PRD but **no matching tech plan** exists → create the tech plan as **`Draft`**, then **stop and ask for review**. Do not write code in the same session.
+- PRD is **`Status: Draft`** → get approval and set to `Active` before coding. Do not activate the PRD without explicit user approval.
+- Tech plan is **`Status: Draft`** → **stop after creating or updating the plan**. Ask the user to review and approve. Do not set `Active` or touch `src/`/`tests/` until the user explicitly approves.
+- Tech plan was **just created or updated in this session** → **stop**. Implementation belongs in a **new agent context** after review, even if the user said "implement."
 - Tech plan is **`Status: Implemented`** → trust rationale; verify file paths against current code.
+
+## Planning session deliverables (stop here)
+
+When the user asks to implement a feature and prerequisites are missing:
+
+1. Ensure PRD is `Active` (or draft it and stop for PRD approval first).
+2. Create `tech-plans/tech-plan-{NNN}.md` with **`Status: Draft`**.
+3. Summarize key decisions for review (schema, routes, services, test approach).
+4. **End the session** — tell the user to review the tech plan and start a **new chat** to implement once approved.
+
+## Implementation session (separate context only)
+
+Start implementation only when **all** of the following are true:
+
+- PRD is `Status: Active`
+- Tech plan is `Status: Active` (user explicitly approved after review)
+- This session did **not** create or materially edit that tech plan
+- User explicitly asks to implement (or continues in a fresh context with an approved plan)
+
+Then: tests first → minimal code → cross-check PRD acceptance criteria → set tech plan to `Implemented (YYYY-MM-DD)`.
 
 ## After implementation
 
@@ -36,11 +59,18 @@ Canonical source: `CONVENTIONS.md` → **SDD Workflow for Agents**. This rule ga
 
 ```
 User: "implement specs/prd-002.md"
-→ Check tech-plans/tech-plan-002.md exists and is Active
-→ If missing: stop, create tech plan, then implement in a follow-up PR
+→ PRD is Draft, no tech plan
+→ Activate PRD only if user explicitly approves; create tech-plan-002.md as Draft
+→ STOP — ask user to review; do not write src/ or tests/
+```
+
+```
+User: "implement specs/prd-002.md" (tech plan already Active from prior review)
+→ New session, plan approved in a previous chat
+→ Read PRD + tech plan, write tests, then implement
 ```
 
 ```
 User: "add password reset tests"
-→ Same gate — password reset maps to prd-002; tech plan required first
+→ Same gate — password reset maps to prd-002; tech plan required and approved first
 ```
