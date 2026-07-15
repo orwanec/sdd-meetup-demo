@@ -1,0 +1,46 @@
+---
+description: Enforce SDD phase order — PRD and tech plan before implementation
+alwaysApply: true
+---
+
+# SDD Workflow (Enforced)
+
+Canonical source: `CONVENTIONS.md` → **SDD Workflow for Agents**. This rule gates code changes.
+
+## Phase order (do not skip)
+
+1. **PRD** — `specs/prd-{NNN}.md` with `Status: Active`
+2. **Tech plan** — `tech-plans/tech-plan-{NNN}.md` with `Status: Active` (or `Implemented` if read-only)
+3. **Implementation** — `src/`, `tests/`, `views/`, etc.
+
+## Before editing `src/` or `tests/` for a PRD feature
+
+1. Identify the PRD number (e.g. user says "implement prd-002").
+2. Confirm `specs/prd-{NNN}.md` exists and is **`Status: Active`** (not `Draft`).
+3. Confirm `tech-plans/tech-plan-{NNN}.md` exists and is **`Status: Active`** or **`Implemented`**.
+4. Read the PRD (all acceptance criteria) and the matching tech plan before writing code.
+
+## Stop conditions (do NOT implement)
+
+- User asks to implement a PRD but **no matching tech plan** exists → create the tech plan first.
+- PRD is **`Status: Draft`** → get approval and set to `Active` before coding.
+- Tech plan is **`Status: Draft`** → get approval and set to `Active` before coding.
+- Tech plan is **`Status: Implemented`** → trust rationale; verify file paths against current code.
+
+## After implementation
+
+- Run the Cross-Check Protocol from `CONVENTIONS.md` against all PRD acceptance criteria.
+- Set tech plan to `Status: Implemented (YYYY-MM-DD)` when delivery is complete; do not edit frozen plans.
+
+## Examples
+
+```
+User: "implement specs/prd-002.md"
+→ Check tech-plans/tech-plan-002.md exists and is Active
+→ If missing: stop, create tech plan, then implement in a follow-up PR
+```
+
+```
+User: "add password reset tests"
+→ Same gate — password reset maps to prd-002; tech plan required first
+```
