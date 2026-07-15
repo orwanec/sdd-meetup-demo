@@ -71,7 +71,7 @@ async function requestReset(email) {
     mailboxService.send({
       to: user.email,
       subject: 'Reset your TaskFlow password',
-      body: `Your password reset link expires in 30 minutes.\n\nReset your password: ${resetUrl}`,
+      body: 'Your password reset link expires in 30 minutes. Use the link below to choose a new password.',
       resetUrl,
     });
   }

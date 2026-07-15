@@ -177,6 +177,8 @@ ul {
   border-radius: var(--radius-lg);
   box-shadow: 0 10px 25px var(--color-shadow);
   padding: var(--space-xl) var(--space-lg);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .page-title {
@@ -290,6 +292,48 @@ form {
   text-align: center;
   font-size: 0.9375rem;
   color: var(--color-text-muted);
+}
+
+.form-help {
+  margin-bottom: var(--space-md);
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+}
+
+/* Developer mailbox */
+
+.mailbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.mailbox-item {
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: #f8fafc;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.mailbox-item p {
+  margin-bottom: var(--space-sm);
+  font-size: 0.9375rem;
+}
+
+.mailbox-item p:last-child {
+  margin-bottom: 0;
+}
+
+.mailbox-url {
+  display: block;
+  margin-top: var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-all;
 }
 
 /* Buttons */

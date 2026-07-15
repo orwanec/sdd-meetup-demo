@@ -19,7 +19,10 @@
                 <p><strong>Subject:</strong> <%= message.subject %></p>
                 <p><strong>Sent:</strong> <%= message.sentAt.toISOString() %></p>
                 <p><strong>Body:</strong> <%= message.body %></p>
-                <p><a href="<%= message.resetUrl %>"><%= message.resetUrl %></a></p>
+                <p>
+                  <strong>Reset link:</strong>
+                  <a class="mailbox-url" href="<%= message.resetUrl %>"><%= message.resetUrl %></a>
+                </p>
               </li>
             <% }); %>
           </ul>
