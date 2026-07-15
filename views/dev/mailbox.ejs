@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head', { title: 'Developer Mailbox · TaskFlow' }) %>
+  </head>
+  <body class="page page-auth">
+    <main class="container">
+      <div class="auth-card">
+        <h1 class="page-title">Developer Mailbox</h1>
+        <p class="form-help">Local demo inbox for password reset messages.</p>
+
+        <% if (!messages.length) { %>
+          <p class="alert alert-info">No messages yet.</p>
+        <% } else { %>
+          <ul class="mailbox-list">
+            <% messages.forEach(function(message) { %>
+              <li class="mailbox-item">
+                <p><strong>To:</strong> <%= message.to %></p>
+                <p><strong>Subject:</strong> <%= message.subject %></p>
+                <p><strong>Sent:</strong> <%= message.sentAt.toISOString() %></p>
+                <p><strong>Body:</strong> <%= message.body %></p>
+                <p><a href="<%= message.resetUrl %>"><%= message.resetUrl %></a></p>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+
+        <div class="form-footer">
+          <p><a href="/auth/login">Back to login</a></p>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

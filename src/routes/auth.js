@@ -7,6 +7,7 @@
 const express = require('express');
 
 const { register, login } = require('../services/authService');
+const passwordResetService = require('../services/passwordResetService');
 
 const router = express.Router();
 
@@ -36,7 +37,13 @@ router.post('/register', async (req, res) => {
 });
 
 router.get('/login', (req, res) => {
-  const message = req.query && req.query.registered ? 'Registration successful. Please login.' : null;
+  let message = null;
+  if (req.query && req.query.registered) {
+    message = 'Registration successful. Please login.';
+  } else if (req.query && req.query.reset) {
+    message = 'Your password was updated. Please log in with your new password.';
+  }
+
   res.status(200).render('auth/login', { error: null, message, email: '' });
 });
 
@@ -65,6 +72,76 @@ router.post('/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect(302, '/auth/login');
   });
+});
+
+router.get('/forgot-password', (_req, res) => {
+  res.status(200).render('auth/forgot-password', { error: null, email: '' });
+});
+
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body || {};
+
+  try {
+    await passwordResetService.requestReset(email);
+    return res.status(200).render('auth/forgot-password-sent');
+  } catch (err) {
+    const status = err.status || 400;
+    return res.status(status).render('auth/forgot-password', {
+      error: err.message || 'Unable to process reset request.',
+      email: email || '',
+    });
+  }
+});
+
+router.get('/reset-password/:token', async (req, res) => {
+  const token = req.params.token;
+  const tokenData = await passwordResetService.findValidToken(token);
+
+  if (!tokenData) {
+    return res.status(200).render('auth/reset-link-invalid');
+  }
+
+  return res.status(200).render('auth/reset-password', {
+    token,
+    error: null,
+  });
+});
+
+router.post('/reset-password/:token', async (req, res) => {
+  const token = req.params.token;
+  const { password, password_confirm: passwordConfirm } = req.body || {};
+
+  if (passwordConfirm && password !== passwordConfirm) {
+    const tokenData = await passwordResetService.findValidToken(token);
+    if (!tokenData) {
+      return res.status(200).render('auth/reset-link-invalid');
+    }
+
+    return res.status(400).render('auth/reset-password', {
+      token,
+      error: 'Passwords do not match.',
+    });
+  }
+
+  try {
+    await passwordResetService.resetPassword(token, password);
+    return res.redirect(302, '/auth/login?reset=1');
+  } catch (err) {
+    if (err.code === 'INVALID_TOKEN') {
+      return res.status(200).render('auth/reset-link-invalid');
+    }
+
+    const tokenData = await passwordResetService.findValidToken(token);
+    if (!tokenData) {
+      return res.status(200).render('auth/reset-link-invalid');
+    }
+
+    const status = err.status || 400;
+    return res.status(status).render('auth/reset-password', {
+      token,
+      error: err.message || 'Unable to reset password.',
+    });
+  }
 });
 
 module.exports = router;

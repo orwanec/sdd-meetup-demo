@@ -134,9 +134,40 @@ async function login(email, password) {
   return { id: user.id, email: user.email };
 }
 
+/**
+ * Updates a user's password after validation and hashing.
+ * @param {number} userId
+ * @param {string} password
+ * @returns {Promise<void>}
+ * @throws {Error & { status?: number, code?: string }} On validation failure or missing user
+ */
+async function updatePassword(userId, password) {
+  const passwordCheck = validatePassword(password);
+  if (!passwordCheck.ok) {
+    const err = new Error(passwordCheck.message);
+    err.code = 'VALIDATION_PASSWORD';
+    err.status = 400;
+    throw err;
+  }
+
+  const passwordHash = await hashPassword(password);
+  const db = getDb();
+  const result = await dbRun(db, 'UPDATE users SET password_hash = ? WHERE id = ?', [
+    passwordHash,
+    userId,
+  ]);
+
+  if (result.changes === 0) {
+    const err = new Error('User not found.');
+    err.status = 404;
+    throw err;
+  }
+}
+
 module.exports = {
   register,
   login,
+  updatePassword,
   validateEmail,
   validatePassword,
 };

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head', { title: 'Invalid Reset Link · TaskFlow' }) %>
+  </head>
+  <body class="page page-auth">
+    <main class="container">
+      <div class="auth-card">
+        <h1 class="page-title">Reset Link Invalid</h1>
+        <p class="form-error" role="alert">
+          This reset link is no longer valid. It may have expired or already been used.
+        </p>
+        <p class="form-help">Request a new password reset to continue.</p>
+
+        <div class="form-actions">
+          <a class="btn btn-primary btn-block" href="/auth/forgot-password">Request new reset</a>
+        </div>
+
+        <div class="form-footer">
+          <p><a href="/auth/login">Back to login</a></p>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

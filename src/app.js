@@ -15,6 +15,7 @@ const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const taskRoutes = require('./routes/tasks');
 const apiRoutes = require('./routes/api');
+const devRoutes = require('./routes/dev');
 const { csrfProtection } = require('./middleware/csrf');
 
 const app = express();
@@ -67,5 +68,6 @@ app.use('/auth', authRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/tasks', taskRoutes);
 app.use('/api', apiRoutes);
+app.use('/dev', devRoutes);
 
 module.exports = app;
